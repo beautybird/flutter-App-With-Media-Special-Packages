@@ -1,0 +1,24 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="net.flutterfeatures.special">
+    <!-- Flutter needs it to communicate with the running application
+         to allow setting breakpoints, to provide hot reload, etc.
+    -->
+
+    <!--https://developer.android.com/guide/topics/manifest/manifest-intro-->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.BIND_QUICK_ACCESS_WALLET_SERVICE"/>
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="30"/>
+    <!--  <uses-feature android:version="1"/>  -->
+    <uses-feature android:name="android.gradle.wrapper"/>
+    <uses-feature android:name="android.hardware.sensor.compass"/>
+
+</manifest>

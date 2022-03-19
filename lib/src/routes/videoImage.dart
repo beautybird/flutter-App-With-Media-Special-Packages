@@ -63,7 +63,7 @@ class _VideoImageState extends State<VideoImage> {
   Uint8List? imageBytes;
   String? imageBase64String;
 
-  Future<String?>? _getImageFromCamera(var companyLogoFile) async {
+  Future<String?>? _getImageFromCamera(var imageFile) async {
     try {
       imagePickedFile = await ImagePicker().pickImage(
           source: ImageSource.camera,
@@ -88,7 +88,7 @@ class _VideoImageState extends State<VideoImage> {
     return imageFromCamera!;
   }
 
-  Future<String?>? _getImageFromGallery(var companyLogoFile) async {
+  Future<String?>? _getImageFromGallery(var imageFile) async {
     try {
       imagePickedFile = await ImagePicker().pickImage(
           source: ImageSource.gallery,
@@ -286,7 +286,6 @@ class _VideoImageState extends State<VideoImage> {
                             .saveDataModel(
                                 _productString, _videoLinkString, image)!
                             .then((futureResult) {
-                          print('futureResult $futureResult');
                           if (futureResult!.contains('save') == true) {
                             setState(() {
                               ScaffoldMessenger.of(context).showSnackBar(

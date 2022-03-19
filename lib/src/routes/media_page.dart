@@ -91,9 +91,9 @@ class _ShowImageVideoState extends State<ShowImageVideo> {
   @override
   Widget build(BuildContext context) {
     //We create a MediaProvider instance to get the media in the media list
-    var mediaProviderInstance = Provider.of<MediaProvider>(context);
-    videoDataValue = mediaProviderInstance.videoData;
-    imageDataValue = mediaProviderInstance.imageData;
+    var mediaProviderInstance = Provider.of<MediaProvider>(context)
+    videoDataValue = mediaProviderInstance.mediaList!.elementAt(0);
+    imageDataValue = mediaProviderInstance.mediaList!.elementAt(1);
 
     return Scaffold(
       body: selectedMedia,

@@ -365,19 +365,19 @@ class _VideoImageState extends State<VideoImage> {
                   onPressed: () {
                     //query database for media..then assign result list
                     // to the List property in the MediaProvider class
-                    fetchMediaData(context, _productString)
-                    !.then((value) {
-                      if(value!.isNotEmpty == true){
-                        mediaProviderInstance.setMedia(fetchedDataList);
-                      }else{
+                    fetchMediaData(context, _productString)!.then((value) {
+                      if (value!.isNotEmpty == true) {
+                        mediaProviderInstance.setMedia(value);
+                      } else {
                         mediaProviderInstance.setMedia([]);
                       }
-                    })
-                    .onError((error, stackTrace) {
-                      mediaProviderInstance.setMedia([]);
-                    })
-                    .whenComplete(() => null);
-
+                    }).onError((error, stackTrace) {
+                      setState(() {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Error Fetching')),
+                        );
+                      });
+                    }).whenComplete(() => null);
                   },
                   child: const Text(
                     'Fetch',

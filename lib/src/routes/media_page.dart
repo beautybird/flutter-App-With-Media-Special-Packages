@@ -33,15 +33,17 @@ class _ShowImageVideoState extends State<ShowImageVideo> {
   bool? _muted = false;
   bool? _isPlayerReady = false;
 
+  //If you wish show list of videos
   final List<String?>? _ids = [
-    'nPt8bK2gbaU',
+    'video_address_1',
+    'video_address_2',
   ];
 
   // Create image and video variables...assign values to them
   //from the MediaProvider
   String? videoDataValue;
   String? imageDataValue;
-
+  MediaProvider? mediaProviderInstance;
   //
   @override
   void initState() {
@@ -56,7 +58,8 @@ class _ShowImageVideoState extends State<ShowImageVideo> {
 
     super.initState();
 
-    getSelectedMedia();
+    //Initialize the media
+    //getSelectedMedia();
   }
 
   void listener() {
@@ -91,18 +94,16 @@ class _ShowImageVideoState extends State<ShowImageVideo> {
   @override
   Widget build(BuildContext context) {
     //We create a MediaProvider instance to get the media in the media list
-    var mediaProviderInstance = Provider.of<MediaProvider>(context)
-    videoDataValue = mediaProviderInstance.mediaList!.elementAt(0);
-    imageDataValue = mediaProviderInstance.mediaList!.elementAt(1);
+    mediaProviderInstance = Provider.of<MediaProvider>(context);
 
     return Scaffold(
-      body: selectedMedia,
+      body: getSelectedMedia(),
     );
   }
 
   Widget? selectedMedia;
   Widget? getSelectedMedia() {
-    if(videoDataValue!.isEmpty == true && imageDataValue!.isEmpty == true){
+    if(mediaProviderInstance!.mediaList!.isEmpty == true){
       setState(() {
         selectedMedia = Image.asset('assets/images/noproduct.png');
       });

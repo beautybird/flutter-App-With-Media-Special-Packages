@@ -9,7 +9,7 @@ class ModelsClass {
     return saveMediaFuture;
   }
 
-  //Fetcing Media Data Model
+  //Fetching Media Data Model
   List? fetchedMediaFuture;
   Future<List?>? fetchDataModel(String? mediaData) async{
     fetchedMediaFuture = await Databases().queryMedia(mediaData);

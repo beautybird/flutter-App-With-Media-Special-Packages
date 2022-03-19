@@ -25,7 +25,6 @@ class Databases {
     try {
       await connection!.open();
       await connection!.transaction((conn) async {
-        print('here 1');
         saveDetailsResult = await conn.query(
           'insert into data.details(product,videoLink,image) '
           'values( @product,@video,@image)',
@@ -37,14 +36,11 @@ class Databases {
           allowReuse: true,
           timeoutInSeconds: 30,
         );
-        print('here 2');
         dataSavedFuture =
             (saveDetailsResult!.affectedRowCount > 0 ? 'save' : 'not');
-        print('here 3');
       });
     } catch (exc) {
       dataSavedFuture = 'err';
-      print('here 4');
       exc.toString();
     }
     print('data save $dataSavedFuture');
@@ -59,25 +55,25 @@ class Databases {
     try {
       await connection!.open();
       await connection!.transaction((mediaConn) async {
-        print('here 1');
-        queryMediaResult = await mediaConn.query(
-          'select videoLink,image from data.details where product = @product',
+        await mediaConn
+            .query(
+          'select videoLink,image from data.details where product= @product',
           substitutionValues: {
             'product': productName,
           },
           allowReuse: false,
           timeoutInSeconds: 30,
-        );
-        queriedMediaFuture = (queryMediaResult!.affectedRowCount > 0
-        ? queryMediaResult!.first.toList()
-            : []
-        );
-        print(' lenght is ${queriedMediaFuture!.length}');
-        print('here 3');
+        )
+            .then((queryResult) {
+          queriedMediaFuture = (queryResult.affectedRowCount > 0
+              ? queryResult.first.toList()
+              : []);
+        }).onError((error, stackTrace) {
+          queriedMediaFuture = null;
+        }).whenComplete(() => null);
       });
     } catch (exc) {
       queriedMediaFuture = null;
-      print('here 4');
       exc.toString();
     }
     queriedMediaFuture;

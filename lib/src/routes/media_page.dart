@@ -113,7 +113,6 @@ class _ShowImageVideoState extends State<ShowImageVideo> {
   }
 
   Widget? getVideoMedia() {
-    //videoDataValue = mediaProviderInstance!.mediaList!.elementAt(0);
     _getVideoController();
     selectedMedia = prLogoVideoWidget();
     return selectedMedia;

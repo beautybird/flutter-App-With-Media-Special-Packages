@@ -26,6 +26,7 @@ class VideoImage extends StatefulWidget {
 class _VideoImageState extends State<VideoImage> {
   //
   final _addMediaFormKey = GlobalKey<FormState>();
+  final _showMediaFormKey = GlobalKey<FormState>();
   //
   final _videoLinkController = TextEditingController();
   String? _videoLinkString;
@@ -347,80 +348,81 @@ class _VideoImageState extends State<VideoImage> {
             padding: const EdgeInsets.symmetric(
               horizontal: 15.0,
             ),
-            child: Column(
-              children: [
-                StandardFormTextField(
-                  controller: _showMediaController,
-                  textInputType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                  fieldBorderColor: Colors.blue,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w400,
-                  fontColor: Colors.black,
-                  icon: Icons.ten_k,
-                  tooltip: 'Type Product Name',
-                  obsecureText: false,
-                  maxLines: 1,
-                  formTextFieldLabel: 'Type Product Name',
-                  validate: (stringPassValue) =>
-                      stringPassValue!.isEmpty == true
-                          ? 'Type Product Name'
-                          : null,
-                ),
-                const SizedBox(
-                  height: 15.0,
-                ),
-                TextButton(
-                  onPressed: () {
-                    //query database for media..then assign result list
-                    // to the List property in the MediaProvider class
-                    if (_addMediaFormKey.currentState!.validate()) {
-                      _addMediaFormKey.currentState!.save();
-                      fetchMediaData(context, _showMediaString)!.then((value) {
-                        if (value!.isNotEmpty == true) {
-                          print('is not empty');
-                          mediaProviderInstance.setMedia(value);
+            child: Form(
+              key: _showMediaFormKey,
+              child: Column(
+                children: [
+                  StandardFormTextField(
+                    controller: _showMediaController,
+                    textInputType: TextInputType.text,
+                    textInputAction: TextInputAction.next,
+                    fieldBorderColor: Colors.blue,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w400,
+                    fontColor: Colors.black,
+                    icon: Icons.ten_k,
+                    tooltip: 'Type Product Name',
+                    obsecureText: false,
+                    maxLines: 1,
+                    formTextFieldLabel: 'Type Product Name',
+                    validate: (stringPassValue) =>
+                        stringPassValue!.isEmpty == true
+                            ? 'Type Product Name'
+                            : null,
+                  ),
+                  const SizedBox(
+                    height: 15.0,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      //query database for media..then assign result list
+                      // to the List property in the MediaProvider class
+                      if (_showMediaFormKey.currentState!.validate()) {
+                        _showMediaFormKey.currentState!.save();
+                        fetchMediaData(context, _showMediaString)!.then((value) {
+                          if (value!.isNotEmpty == true) {
+                            mediaProviderInstance.setMedia(value);
+                            setState(() {
+                              showMediaContainer = true;
+                            });
+                          } else {
+                            mediaProviderInstance.setMedia([]);
+                            setState(() {
+                              showMediaContainer = true;
+                            });
+                          }
+                        }).onError((error, stackTrace) {
                           setState(() {
-                            showMediaContainer = true;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Error Fetching')),
+                            );
                           });
-                        } else {
-                          print('is  empty');
-                          mediaProviderInstance.setMedia([]);
-                          setState(() {
-                            showMediaContainer = true;
-                          });
-                        }
-                      }).onError((error, stackTrace) {
+                        }).whenComplete(() => null);
+                      } else {
                         setState(() {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Error Fetching')),
+                            const SnackBar(
+                                content: Text(
+                              'Fill All Fields',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 20.0),
+                            )),
                           );
                         });
-                      }).whenComplete(() => null);
-                    } else {
-                      setState(() {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text(
-                            'Fill All Fields',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 20.0),
-                          )),
-                        );
-                      });
-                    }
-                  },
-                  child: const Text(
-                    'Fetch',
-                    style: TextStyle(
-                      fontSize: 20.0,
+                      }
+                    },
+                    child: const Text(
+                      'Fetch',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 15.0,
-                ),
-              ],
+                  const SizedBox(
+                    height: 15.0,
+                  ),
+                ],
+              ),
             ),
           ),
           const Divider(

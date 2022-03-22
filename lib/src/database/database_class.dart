@@ -72,7 +72,6 @@ class Databases {
       queriedMediaFuture = null;
       exc.toString();
     }
-    print('query future is $queriedMediaFuture');
     return queriedMediaFuture;
   }
 }

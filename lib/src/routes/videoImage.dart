@@ -429,7 +429,8 @@ class _VideoImageState extends State<VideoImage> {
             height: 5.0,
             thickness: 5.0,
           ),
-          if (showMediaContainer == true) const ShowImageVideo(),
+          if (showMediaContainer == true)
+            const ShowImageVideo(),
         ],
       ),
     );

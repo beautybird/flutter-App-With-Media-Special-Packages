@@ -37,7 +37,7 @@ class _VideoImageState extends State<VideoImage> {
   }
 
   final _productController = TextEditingController();
-  String? _productString;
+  String _productString = '';
   String? _getProduct() {
     _productString = ((_productController.text).isNotEmpty == true
         ? _productController.text
@@ -141,6 +141,9 @@ class _VideoImageState extends State<VideoImage> {
     return noProductImageBase64!;
   }
 
+  //Hide the container where video will show
+  bool showMediaContainer = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -215,15 +218,15 @@ class _VideoImageState extends State<VideoImage> {
                     obsecureText: false,
                     maxLines: 1,
                     formTextFieldLabel: 'Add Product',
-                    validate: (stringPassValue) =>
-                        stringPassValue!.isEmpty == true ? 'Add Product' : null,
+                    validate: (String? productNameString) =>
+                        _productString.isEmpty == true ? 'Add Product' : null,
                   ),
                   const SizedBox(
                     height: 20.0,
                   ),
                   StandardFormTextField(
                     controller: _videoLinkController,
-                    textInputType: TextInputType.text,
+                    textInputType: TextInputType.name,
                     textInputAction: TextInputAction.next,
                     fieldBorderColor: Colors.blue,
                     fontSize: 16.0,
@@ -234,10 +237,10 @@ class _VideoImageState extends State<VideoImage> {
                     obsecureText: false,
                     maxLines: 1,
                     formTextFieldLabel: 'Add video Link',
-                    validate: (stringPassValue) =>
-                        stringPassValue!.isEmpty == true
+                    /*validate: (videoLinkValue) =>
+                        videoLinkValue!.isEmpty == true
                             ? 'Add video Link'
-                            : null,
+                            : null,*/
                   ),
                   const SizedBox(
                     height: 20.0,
@@ -310,7 +313,13 @@ class _VideoImageState extends State<VideoImage> {
                         setState(() {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Error'),
+                              content: Text(
+                                'Fill Product Name Field',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                ),
+                              ),
                             ),
                           );
                         });
@@ -365,19 +374,41 @@ class _VideoImageState extends State<VideoImage> {
                   onPressed: () {
                     //query database for media..then assign result list
                     // to the List property in the MediaProvider class
-                    fetchMediaData(context, _productString)!.then((value) {
-                      if (value!.isNotEmpty == true) {
-                        mediaProviderInstance.setMedia(value);
-                      } else {
-                        mediaProviderInstance.setMedia([]);
-                      }
-                    }).onError((error, stackTrace) {
+                    if (_addMediaFormKey.currentState!.validate()) {
+                      _addMediaFormKey.currentState!.save();
+                      fetchMediaData(context, _showMediaString)!.then((value) {
+                        if (value!.isNotEmpty == true) {
+                          print('is not empty');
+                          mediaProviderInstance.setMedia(value);
+                          setState(() {
+                            showMediaContainer = true;
+                          });
+                        } else {
+                          print('is  empty');
+                          mediaProviderInstance.setMedia([]);
+                          setState(() {
+                            showMediaContainer = true;
+                          });
+                        }
+                      }).onError((error, stackTrace) {
+                        setState(() {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Error Fetching')),
+                          );
+                        });
+                      }).whenComplete(() => null);
+                    } else {
                       setState(() {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Error Fetching')),
+                          const SnackBar(
+                              content: Text(
+                            'Fill All Fields',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 20.0),
+                          )),
                         );
                       });
-                    }).whenComplete(() => null);
+                    }
                   },
                   child: const Text(
                     'Fetch',
@@ -389,26 +420,14 @@ class _VideoImageState extends State<VideoImage> {
                 const SizedBox(
                   height: 15.0,
                 ),
-                ContainerStandard(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  minWidth: 300.0,
-                  maxWidth: 350.0,
-                  minHeight: 200.0,
-                  maxHeight: 200.0,
-                  gradientColorOne: Colors.white,
-                  gradientColorTwo: Colors.white,
-                  boxBorder: Border.all(
-                    color: Colors.blue,
-                    width: 0.8,
-                    style: BorderStyle.solid,
-                  ),
-                  boxBorderRadius: BorderRadius.circular(20.0),
-                  child: const ShowImageVideo(),
-                ),
               ],
             ),
           ),
+          const Divider(
+            height: 5.0,
+            thickness: 5.0,
+          ),
+          if (showMediaContainer == true) const ShowImageVideo(),
         ],
       ),
     );
@@ -419,7 +438,6 @@ class _VideoImageState extends State<VideoImage> {
   Future<List?>? fetchMediaData(
       BuildContext context, String? productName) async {
     fetchedDataList = await ModelsClass().fetchDataModel(productName);
-    print(fetchedDataList!.isEmpty);
     return fetchedDataList;
   }
 }

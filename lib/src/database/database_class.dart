@@ -55,27 +55,24 @@ class Databases {
     try {
       await connection!.open();
       await connection!.transaction((mediaConn) async {
-        await mediaConn
-            .query(
-          'select videoLink,image from data.details where product= @product',
+        queryMediaResult = await mediaConn.query(
+          'select videoLink,image from data.details where product= @product order by id',
           substitutionValues: {
             'product': productName,
           },
           allowReuse: false,
           timeoutInSeconds: 30,
-        )
-            .then((queryResult) {
-          queriedMediaFuture = (queryResult.affectedRowCount > 0
-              ? queryResult.first.toList()
-              : []);
-        }).onError((error, stackTrace) {
-          queriedMediaFuture = null;
-        }).whenComplete(() => null);
+        );
+
+        queriedMediaFuture = (queryMediaResult!.affectedRowCount > 0
+            ? queryMediaResult!.first
+            : []);
       });
     } catch (exc) {
       queriedMediaFuture = null;
       exc.toString();
     }
-    queriedMediaFuture;
+    print('query future is $queriedMediaFuture');
+    return queriedMediaFuture;
   }
 }

@@ -22,7 +22,6 @@ class ShowImageVideo extends StatefulWidget {
 }
 
 class _ShowImageVideoState extends State<ShowImageVideo> {
-
   YoutubePlayerController? _controller;
   TextEditingController? _idController;
   TextEditingController? _seekToController;
@@ -32,12 +31,6 @@ class _ShowImageVideoState extends State<ShowImageVideo> {
   double? _volume = 100;
   bool? _muted = false;
   bool? _isPlayerReady = false;
-
-  //If you wish show list of videos
-  final List<String?>? _ids = [
-    'video_address_1',
-    'video_address_2',
-  ];
 
   // Create image and video variables...assign values to them
   //from the MediaProvider
@@ -53,13 +46,7 @@ class _ShowImageVideoState extends State<ShowImageVideo> {
     _videoMetaData = const YoutubeMetaData();
     _playerState = PlayerState.unknown;
 
-    videoDataValue = '';
-    imageDataValue = '';
-
     super.initState();
-
-    //Initialize the media
-    //getSelectedMedia();
   }
 
   void listener() {
@@ -96,35 +83,55 @@ class _ShowImageVideoState extends State<ShowImageVideo> {
     //We create a MediaProvider instance to get the media in the media list
     mediaProviderInstance = Provider.of<MediaProvider>(context);
 
-    return Scaffold(
-      body: getSelectedMedia(),
-    );
+    return showMedia()!;
   }
 
+  // Check if provider media is not empty
   Widget? selectedMedia;
-  Widget? getSelectedMedia() {
-    if(mediaProviderInstance!.mediaList!.isEmpty == true){
-      setState(() {
-        selectedMedia = Image.asset('assets/images/noproduct.png');
-      });
-    }else if (videoDataValue.toString().contains('null') == true ||
-        videoDataValue!.isEmpty == true ||
-        videoDataValue == null) {
-      setState(() {
-        selectedMedia = getImageData();
-      });
-    } else {
-      _getVideoController();
-      selectedMedia = prLogoVideoWidget();
-      Timer(const Duration(seconds: 30), () {
-        if (!mounted) return;
-        setState(() {
-          selectedMedia = getImageData();
-        });
-      });
-    }
+  Widget? mediaWidget;
 
+  Widget? showMedia() {
+    videoDataValue = mediaProviderInstance!.mediaList!.elementAt(0);
+    imageDataValue = mediaProviderInstance!.mediaList!.elementAt(1);
+
+    if ( _controller == null ) {
+      if (videoDataValue != null && videoDataValue!.isNotEmpty == true) {
+        mediaWidget = getVideoMedia();
+        Timer(const Duration(seconds: 30), () {
+          if (!mounted) return;
+          setState(() {
+            mediaWidget = getImageData();
+          });
+        });
+      } else {
+        mediaWidget = getImageData();
+      }
+    } else {
+      mediaWidget = getImageData();
+    }
+    return mediaWidget;
+  }
+
+  Widget? getVideoMedia() {
+    //videoDataValue = mediaProviderInstance!.mediaList!.elementAt(0);
+    _getVideoController();
+    selectedMedia = prLogoVideoWidget();
     return selectedMedia;
+  }
+
+  YoutubePlayerController? _getVideoController() {
+    return _controller = YoutubePlayerController(
+      initialVideoId: YoutubePlayer.convertUrlToId(videoDataValue.toString())!,
+      flags: const YoutubePlayerFlags(
+        mute: false,
+        autoPlay: true,
+        disableDragSeek: false,
+        loop: false,
+        isLive: false,
+        forceHD: false,
+        enableCaption: true,
+      ),
+    )..addListener(listener);
   }
 
   Widget? prLogoVideo;
@@ -146,11 +153,11 @@ class _ShowImageVideoState extends State<ShowImageVideo> {
         return ContainerStandard(
           alignment: Alignment.center,
           padding: const EdgeInsets.all(5.0),
-          minWidth: 300.0,
-          maxWidth: 300.0,
-          minHeight: 100.0,
-          maxHeight: 250.0,
-          color: Colors.white,
+          minWidth: 350.0,
+          maxWidth: 350.0,
+          minHeight: 200.0,
+          maxHeight: 200.0,
+          //color: Colors.white,
           boxBorderColor: Colors.yellow,
           boxBorderRadius: const BorderRadius.all(
             Radius.circular(10.0),
@@ -178,29 +185,19 @@ class _ShowImageVideoState extends State<ShowImageVideo> {
 
     return prLogoVideo;
   }
-
-  YoutubePlayerController? _getVideoController() {
-    return _controller = YoutubePlayerController(
-      initialVideoId: YoutubePlayer.convertUrlToId(videoDataValue.toString())!,
-      flags: const YoutubePlayerFlags(
-        mute: false,
-        autoPlay: true,
-        disableDragSeek: false,
-        loop: false,
-        isLive: false,
-        forceHD: false,
-        enableCaption: true,
-      ),
-    )..addListener(listener);
-  }
+/////////////////////////////////////////
 
   //Image
   Image? imageSelectedFromSource;
   Image? getImageData() {
-    if (imageDataValue!.isNotEmpty == true) {
-      imageSelectedFromSource = Image.memory(
-        base64.decode(imageDataValue!),
-      );
+    if (imageDataValue != null) {
+      if (imageDataValue!.isNotEmpty == true) {
+        imageSelectedFromSource = Image.memory(
+          base64.decode(imageDataValue!),
+        );
+      } else {
+        imageSelectedFromSource = Image.asset('assets/images/noproduct.png');
+      }
     } else {
       imageSelectedFromSource = Image.asset('assets/images/noproduct.png');
     }
